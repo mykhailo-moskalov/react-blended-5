@@ -1,7 +1,7 @@
 import styles from './RatesList.module.css';
 
 interface RatesListProps {
-  rates: [{ key: string; value: number }];
+  rates: { key: string; value: string }[];
 }
 
 export default function RatesList({ rates }: RatesListProps) {
