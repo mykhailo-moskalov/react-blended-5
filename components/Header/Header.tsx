@@ -5,9 +5,19 @@ import { MdCurrencyExchange } from 'react-icons/md';
 import { usePathname } from 'next/navigation';
 
 import styles from './Header.module.css';
+import SelectRates from '../SelectRates/SelectRates';
+import { useLatestRatesStore } from '@/lib/stores/currencyStore';
 
 export default function Header() {
   const pathname = usePathname();
+
+  const {  baseCurrency, hasHydrated, setBaseCurrency } = useLatestRatesStore();
+
+  if (!hasHydrated) return null;
+
+  if (!baseCurrency) {
+    setBaseCurrency("USD");
+  }
 
   return (
     <header className={styles.header}>
@@ -30,6 +40,8 @@ export default function Header() {
       </div>
 
       {/* ✔ Add base currency here !!! */}
+      {baseCurrency && (<SelectRates baseCurrency={baseCurrency} setBaseCurrency={setBaseCurrency}/>)}
+
     </header>
   );
 }

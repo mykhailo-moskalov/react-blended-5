@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // interface RatesObj {
 //   key: string;
@@ -18,24 +19,40 @@ type LatestRates = {
   setRates: (rates: [string, number][]) => void;
   filter: string;
   setFilter: (filter: string) => void;
+  hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 };
 
-export const useLatestRatesStore = create<LatestRates>()((set) => ({
-  baseCurrency: '',
-  setBaseCurrency: (baseCurrency: string) => set(() => ({ baseCurrency })),
+export const useLatestRatesStore = create<LatestRates>()(
+  persist(
+    (set) => ({
+      baseCurrency: '',
+      setBaseCurrency: (baseCurrency: string) => set(() => ({ baseCurrency })),
 
-  exchangeInfo: null,
-  setExchangeInfo: (info: null) => set(() => ({ exchangeInfo: info })),
+      exchangeInfo: null,
+      setExchangeInfo: (info: null) => set(() => ({ exchangeInfo: info })),
 
-  isLoading: false,
-  setIsLoading: () => set(() => ({ isLoading: true })),
+      isLoading: false,
+      setIsLoading: () => set(() => ({ isLoading: true })),
 
-  isError: false,
-  setIsError: () => set(() => ({ isError: true })),
+      isError: false,
+      setIsError: () => set(() => ({ isError: true })),
 
-  rates: [],
-  setRates: (rates: [string, number][]) => set(() => ({ rates: rates })),
+      rates: [],
+      setRates: (rates: [string, number][]) => set(() => ({ rates: rates })),
 
-  filter: '',
-  setFilter: (filter: string) => set(() => ({ filter: filter })),
-}));
+      filter: '',
+      setFilter: (filter: string) => set(() => ({ filter: filter })),
+  
+      hasHydrated: false,
+      setHasHydrated: (state: boolean) => set({ hasHydrated: state }),
+    }),
+    {
+      name: 'currency-storage',
+      partialize: (state) => ({ baseCurrency: state.baseCurrency }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
+    }
+  )
+  );
